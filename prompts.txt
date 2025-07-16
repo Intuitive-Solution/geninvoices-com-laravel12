@@ -1,0 +1,61 @@
+# Create New Entity Resources
+
+--------------
+I want to a new entity called Resources 
+ with the attributes 
+Name 
+Description
+Rate
+and has a relationship to company and create required migration files 
+and let me know the command to run the migration file
+
+-----------------
+
+
+Create code flow for Resources  a similar to Expenses 
+
+
+In Controller Layer have methods 
+
+index(): Lists resources with filtering 
+show(): Displays a specific resource
+create(): Shows form for creating new resource
+store(): Saves new resource
+edit(): Shows form for editing resource
+update(): Updates existing resource
+destroy(): Deletes resource
+
+In Request Validation Layer:
+Multiple request classes for different operations:
+StoreResourceRequest: Validates resources creation
+UpdateResourceeRequest: Validates resources updates
+ShowResourceRequest: Validates resources viewing
+DestroyResourceRequest: Validates resources deletion
+
+
+In Repository Layer:
+Handles data persistence and business logic
+Key methods:
+save(): Saves resource data
+delete(): Deletes resource
+
+
+In Policy Layer :
+Handles authorization rules
+Defines who can create, view, edit, and delete resources
+Extends EntityPolicy for common functionality
+
+
+API Routes:
+RESTful endpoints for all expense operations:
+GET /api/v1/resources: List resources
+GET /api/v1/resources/{id}: Show resource
+POST /api/v1/resources: Create resource
+PUT /api/v1/resources/{id}: Update resource
+DELETE /api/v1/resources/{id}: Delete resource
+
+Create ResourceTransformer similar to ExpenseTransformer
+Create ResourceFilters similar ExpenseFilters
+Create ResourcePolicy similar 
+
+--------------------------------------------------------
