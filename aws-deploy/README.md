@@ -129,7 +129,10 @@ aws-deploy/
 │   └── terraform.tfvars               # Your variables (create this)
 ├── scripts/
 │   ├── server-setup.sh                # Server setup script
-│   └── deploy-app.sh                  # Application deployment script
+│   ├── deploy-app.sh                  # Application deployment script
+│   ├── backup-invoiceninja.sh         # Database and .env backup script
+│   ├── deploy-backup-script.sh        # Backup script deployment utility
+│   └── setup-aws-credentials.sh       # AWS credentials setup script
 ├── config/
 │   └── env.production.template        # Environment template
 └── README.md                          # This file
@@ -160,6 +163,14 @@ aws-deploy/
 - **File permissions** and security
 - **Caching** and optimization
 - **Log rotation** configuration
+
+### Backup System
+- **Automated database backups** with S3 upload
+- **Environment file backups** (.env)
+- **Daily cron jobs** at 1:00 AM
+- **30-day retention policy**
+- **Backup manifests** with restore instructions
+- **S3 storage** in organized folder structure
 
 ## Post-Deployment Steps
 
@@ -225,10 +236,39 @@ tar -czf invoice-ninja-backup.tar.gz /var/www/html
 ```
 
 ### Automated Backups
-Set up a cron job for regular backups:
+Set up automated backups with S3 upload:
+
+1. **Deploy the backup script**:
+   ```bash
+   ssh ec2-user@YOUR_INSTANCE_IP
+   cd /var/www/html/aws-deploy/scripts
+   sudo ./deploy-backup-script.sh
+   ```
+
+2. **Set up AWS credentials** (if using IAM role, skip this step):
+   ```bash
+   sudo ./setup-aws-credentials.sh
+   ```
+
+3. **Test the backup script**:
+   ```bash
+   sudo /opt/scripts/backup-invoiceninja.sh [your_db_password]
+   ```
+
+4. **Verify S3 upload**:
+   ```bash
+   aws s3 ls s3://demo.geninovices.com/database-backups/
+   ```
+
+The script will automatically:
+- Create daily backups at 1:00 AM via cron
+- Upload database and .env files to S3
+- Maintain 30-day retention policy
+- Generate backup manifests with restore instructions
+
+**Manual backup command**:
 ```bash
-# Add to crontab
-0 2 * * * /usr/local/bin/backup-invoiceninja.sh
+sudo /opt/scripts/backup-invoiceninja.sh [DB_PASSWORD]
 ```
 
 ## Security Considerations
@@ -414,3 +454,25 @@ sudo systemctl status crond
 * * * * * /usr/bin/php /var/www/html/artisan schedule:run >> /dev/null 2>&1
 
 This should resolve the corrupted package cache issue and allow the installation to proceed. 
+
+## IMA role for s3
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject", 
+        "s3:ListBucket",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::demo.geninovices.com",
+        "arn:aws:s3:::demo.geninovices.com/*"
+      ]
+    }
+  ]
+} 
+
+sudo ./backup-invoiceninja.sh 
