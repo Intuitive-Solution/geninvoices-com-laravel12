@@ -1,0 +1,6 @@
+# Sensitive files
+config/.env
+*.tfstate
+*.tfvars
+.terraform/
+*.pem
