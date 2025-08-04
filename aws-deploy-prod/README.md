@@ -476,3 +476,21 @@ This should resolve the corrupted package cache issue and allow the installation
 } 
 
 sudo ./backup-invoiceninja.sh 
+
+[ec2-user@ip-10-0-1-26 log]$ crontab -l
+* * * * * cd /var/www/html && sudo /usr/bin/php artisan schedule:run >> /var/log/job-invoiceninja.log 2>&1
+
+0 1 * * * sudo /var/www/html/aws-deploy/scripts/backup-invoiceninja.sh > /var/log/backup-invoiceninja.log 2>&1
+
+
+
+# Install Google Chrome
+sudo yum update -y
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+sudo yum install -y google-chrome-stable_current_x86_64.rpm
+
+# Path will be:
+SNAPPDF_CHROMIUM_PATH="/usr/bin/google-chrome"
+
+# Fix the Permission Issue
+sudo chown -R ec2-user:ec2-user /var/www/html/storage/ && sudo chmod -R 775 /var/www/html/storage/

@@ -34,7 +34,7 @@ info() {
 # Configuration
 BACKUP_DIR="/var/backups/invoiceninja"
 APP_DIR="/var/www/html"
-S3_BUCKET=${2:-"demo.geninovices.com"}
+S3_BUCKET=${2:-"apps.geninovices.com"}
 S3_PREFIX="database-backups"
 RETENTION_DAYS=30
 

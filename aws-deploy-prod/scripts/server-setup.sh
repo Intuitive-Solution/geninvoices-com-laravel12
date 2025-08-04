@@ -204,7 +204,7 @@ log "Configuring Nginx..."
 cat > /etc/nginx/conf.d/invoiceninja.conf << 'EOF'
 server {
     listen 80;
-    server_name demo-app.geninvoices.com;
+    server_name api.geninvoices.com;
     root /var/www/html/public;
     index index.php index.html index.htm;
 

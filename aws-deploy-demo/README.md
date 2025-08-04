@@ -485,3 +485,12 @@ php artisan schedule:list
 * * * * * cd /var/www/html && sudo /usr/bin/php artisan schedule:run >> /var/log/job-invoiceninja.log 2>&1
 
 0 1 * * * sudo /var/www/html/aws-deploy/scripts/backup-invoiceninja.sh > /var/log/backup-invoiceninja.log 2>&1
+
+
+# Install Google Chrome
+sudo yum update -y
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_x86_64.rpm
+sudo yum install -y google-chrome-stable_current_x86_64.rpm
+
+# Path will be:
+SNAPPDF_CHROMIUM_PATH="/usr/bin/google-chrome"
