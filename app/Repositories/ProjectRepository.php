@@ -51,6 +51,7 @@ class ProjectRepository extends BaseRepository
 
                             $item = new InvoiceItem();
                             $item->quantity = $task->getQuantity();
+                            $item->billable_time = $task->getBillableTime();
                             $item->cost = $task->getRate();
                             $item->product_key = '';
                             $item->notes = $body;

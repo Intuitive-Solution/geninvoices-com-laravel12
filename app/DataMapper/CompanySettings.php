@@ -1030,6 +1030,7 @@ class CompanySettings extends BaseSettings
                 '$task.description',
                 '$task.unit',
                 '$task.hours',
+                '$task.billable_time',
                 '$task.discount',
                 '$task.tax',
                 '$task.line_total',

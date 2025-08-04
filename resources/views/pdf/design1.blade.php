@@ -97,6 +97,7 @@
                 notes
                 cost
                 quantity
+                billable_time
                 tax_name1 
                 tax_name2
                 line_total
@@ -105,7 +106,7 @@
                 custom_label3 ( will show as the following parameter as its value -> custom_invoice_value3 )
                 custom_label4 ( will show as the following parameter as its value -> custom_invoice_value4 )
         --}}
-        {!! $invoice->table(['product_key', 'notes', 'cost','quantity', 'discount', 'tax_name1', 'line_total']) !!}
+        {!! $invoice->table(['product_key', 'notes', 'cost','quantity', 'billable_time', 'discount', 'tax_name1', 'line_total']) !!}
 
         <div class="row">
             <div class="d-flex justify-content-end ml-auto mr-4">

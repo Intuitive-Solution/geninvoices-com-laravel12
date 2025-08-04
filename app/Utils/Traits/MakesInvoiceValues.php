@@ -307,6 +307,8 @@ trait MakesInvoiceValues
             if ($item->quantity > 0 || $item->cost > 0) {
                 $data[$key][$table_type.'.quantity'] = $item->quantity == 0 ? '' : Number::formatValueNoTrailingZeroes($item->quantity, $entity);
 
+                $data[$key][$table_type.'.billable_time'] = property_exists($item, 'billable_time') && $item->billable_time > 0 ? Number::formatValueNoTrailingZeroes($item->billable_time, $entity) : '';
+
                 $data[$key][$table_type.'.unit_cost'] = Number::formatMoneyNoRounding($item->cost, $entity);
 
                 $data[$key][$table_type.'.cost'] = Number::formatMoney($item->cost, $entity);
@@ -314,6 +316,8 @@ trait MakesInvoiceValues
                 $data[$key][$table_type.'.line_total'] = $item->quantity == 0 ? '' : Number::formatMoney($item->line_total, $entity);
             } else {
                 $data[$key][$table_type.'.quantity'] = '';
+
+                $data[$key][$table_type.'.billable_time'] = '';
 
                 $data[$key][$table_type.'.unit_cost'] = '';
 

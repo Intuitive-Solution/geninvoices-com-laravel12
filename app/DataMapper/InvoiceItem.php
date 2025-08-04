@@ -69,6 +69,8 @@ class InvoiceItem
 
     public $unit = '';
 
+    public $billable_time = 0;
+
     public static $casts = [
         'task_id' => 'string',
         'expense_id' => 'string',
@@ -98,5 +100,6 @@ class InvoiceItem
         'custom_value4' => 'string',
         'unit_code' => 'string',
         'unit' => 'string',
+        'billable_time' => 'float',
     ];
 }

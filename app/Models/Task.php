@@ -311,6 +311,30 @@ class Task extends BaseModel
         return round(($this->calcDuration() / 3600), 2);
     }
 
+    public function getBillableTime(): float
+    {
+        $duration = 0;
+        $parts = json_decode($this->time_log ?? '{}') ?: [];
+
+        foreach ($parts as $part) {
+            // Check if this time entry is billable (4th element in the array)
+            $is_billable = isset($part[3]) ? $part[3] : true; // Default to billable if not specified
+            
+            if ($is_billable) {
+                $start_time = $part[0];
+                if (count($part) == 1 || ! $part[1]) {
+                    $end_time = time();
+                } else {
+                    $end_time = $part[1];
+                }
+
+                $duration += max($end_time - $start_time, 0);
+            }
+        }
+
+        return round($duration / 3600, 2);
+    }
+
     public function logDuration(int $start_time, int $end_time)
     {
         return max(round(($end_time - $start_time) / 3600, 2), 0);

@@ -39,6 +39,7 @@ $lang = array(
     'description' => 'Beschreibung',
     'unit_cost' => 'Einzelpreis',
     'quantity' => 'Menge',
+    'billable_time' => 'Abrechenbare Zeit',
     'line_total' => 'Summe',
     'subtotal' => 'Zwischensumme',
     'net_subtotal' => 'Netto',

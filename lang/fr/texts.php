@@ -39,6 +39,7 @@ $lang = array(
     'description' => 'Description',
     'unit_cost' => 'Coût unitaire',
     'quantity' => 'Quantité',
+    'billable_time' => 'Temps Facturable',
     'line_total' => 'Total',
     'subtotal' => 'Sous-total',
     'net_subtotal' => 'Net',
