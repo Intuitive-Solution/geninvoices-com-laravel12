@@ -219,12 +219,30 @@ waitForElement("#pdf-iframe", 0).then(function(){
 
     iframe.addEventListener("error", function (event) {
         console.error('PDF iframe failed to load:', event);
+        const loader = document.getElementById("loader");
+        if (loader) {
+            loader.innerHTML = '<div class="text-red-500 text-center"><p>Failed to load PDF.</p><p>Please try refreshing the page.</p></div>';
+        }
     });
 });
 
+// Show progress indicator after 5 seconds
+setTimeout(function() {
+    const loader = document.getElementById("loader");
+    if (loader && !document.getElementById("pdf-iframe")) {
+        loader.innerHTML = '<div class="text-blue-500 text-center"><p>Generating PDF...</p><p>This may take a few moments.</p></div>';
+    }
+}, 5000);
+
 // Track iframe timeout
-waitForElement("#pdf-iframe", 10000).catch(function(){
-    console.error('PDF iframe not found within 10 seconds - possible PDF generation timeout');
+waitForElement("#pdf-iframe", 30000).catch(function(){
+    console.error('PDF iframe not found within 30 seconds - possible PDF generation timeout');
+    
+    // Show user-friendly error message
+    const loader = document.getElementById("loader");
+    if (loader) {
+        loader.innerHTML = '<div class="text-red-500 text-center"><p>PDF generation is taking longer than expected.</p><p>Please try refreshing the page or contact support if the issue persists.</p></div>';
+    }
 });
 
 function waitForElement(querySelector, timeout){

@@ -28,6 +28,7 @@ trait PdfMaker
      */
     public function makePdf($header, $footer, $html)
     {
+        $start_time = microtime(true);
         $pdf = new Snappdf();
 
         $chrome_flags = [
@@ -75,8 +76,8 @@ trait PdfMaker
             '--safebrowsing-disable-auto-update',
             '--disable-features=SharedArrayBuffer,OutOfBlinkCors,NetworkService,NetworkServiceInProcess',
 
-            // Debug/Output
-            '--dump-dom',
+            // Debug/Output - removed dump-dom as it can cause delays
+            // '--dump-dom',
         ];
 
         // if (config('ninja.snappdf_chromium_arguments')) {
@@ -90,15 +91,19 @@ trait PdfMaker
         }
 
         $html = str_ireplace(['file:/', 'iframe', '<embed', '&lt;embed', '&lt;object', '<object', '127.0.0.1', 'localhost'], '', $html);
-
+        
         $generated = $pdf
                         ->setHtml($html)
                         ->generate();
 
+        $execution_time = microtime(true) - $start_time;
+        
         if ($generated) {
+            \Log::info("PDF generated successfully in {$execution_time} seconds");
             return $generated;
         }
 
+        \Log::error("PDF generation failed after {$execution_time} seconds");
         throw new InternalPDFFailure('There was an issue generating the PDF locally');
     }
 }
