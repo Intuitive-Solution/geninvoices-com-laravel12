@@ -44,3 +44,4 @@ _ide_helper.php
 aws-deploy-demo/terraform/.terraform.lock.hcl
 aws-deploy-demo/.deployment-info
 aws-deploy-demo/terraform/terraform.tfstate.backup
+aws-deploy-prod/terraform.tfstate

@@ -1,0 +1,30 @@
+# Terraform state files (CRITICAL - never commit these)
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+
+# Deployment info
+.deployment-info
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# SSH keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+
+# Database dumps
+db/*.sql
+db/*.dump
