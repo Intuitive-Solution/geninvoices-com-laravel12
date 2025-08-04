@@ -11,16 +11,10 @@
         <div class="px-2">
             <div class="bg-white shadow rounded-lg mb-4" translate>
                 <div class="px-4 py-5 sm:p-6">
-                    <div class="sm:flex sm:items-start sm:justify-between">
-                        <div>
-                            <h3 class="text-lg leading-6 font-medium text-gray-900">
-                                {{ ctrans('texts.invoice_number_placeholder', ['invoice' => $invoice->number])}}
-                            </h3>
-                        </div>
-                        <div class="sm:mt-0 sm:ml-6 flex justify-end">
-                            <button @click="document.getElementById('dialogPdf').showModal()" type="button"
-                                class="button button-primary bg-primary">{{ ctrans('texts.view_pdf') }}</button>
-                        </div>
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">
+                            {{ ctrans('texts.invoice_number_placeholder', ['invoice' => $invoice->number])}}
+                        </h3>
                     </div>
                 </div>
             </div>
