@@ -48,13 +48,8 @@
                             </svg>
                           
                         </div>
-                        <span class="text-blue text-weight-bold">Download</span>
+                       
                     </button>
-                    
-                    <!-- Additional Download text button -->
-                    {{-- <button class="float-right mt-2" wire:loading.attr="disabled" wire:click="downloadDocument('{{ $invoice['invoice_id'] }}')" wire:target="downloadDocument('{{ $invoice['invoice_id'] }}')" type="button" style="background: none; border: none; color: #130B7A; text-decoration: underline; cursor: pointer;">
-                        Download
-                    </button> --}}
                 </div>
                 </dl>
             </div>

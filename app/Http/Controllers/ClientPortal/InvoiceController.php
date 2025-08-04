@@ -127,6 +127,13 @@ class InvoiceController extends Controller
         $file = (new \App\Jobs\Entity\CreateRawPdf($invitation))->handle();
 
         $headers = ['Content-Type' => 'application/pdf'];
+        
+        // Check if download is requested
+        if (request()->input('download') == '1') {
+            $filename = $invitation->invoice->numberFormatter() . '.pdf';
+            $headers['Content-Disposition'] = 'attachment; filename="' . $filename . '"';
+        }
+        
         return response()->make($file, 200, $headers);
 
     }

@@ -72,6 +72,8 @@ class PdfSlot extends Component
             $this->entity()->service()->createInvitations();
         }
 
+        // Automatically generate PDF on mount
+        $this->getPdf();
     }
 
     #[Computed]
@@ -88,16 +90,17 @@ class PdfSlot extends Component
 
     public function getPdf()
     {
-
-        // if(!$this->invitation) {
-        //     $this->entity()->service()->createInvitations();
-        //     $this->invitation = $this->entity()->invitations()->first();
-        // }
+        $entity = $this->entity();
+        $invitation = $this->invitation();
+        
+        if (!$entity || !$invitation) {
+            return;
+        }
 
         $blob = [
             'entity_type' => $this->resolveEntityType(),
-            'entity_id' => $this->entity()->id,
-            'invitation_id' => $this->invitation()->id,
+            'entity_id' => $entity->id,
+            'invitation_id' => $invitation->id,
             'download' => false,
         ];
 
@@ -106,23 +109,9 @@ class PdfSlot extends Component
         Cache::put($hash, $blob, 1800);
 
         $this->pdf = $hash;
-
     }
 
-    public function downloadPdf()
-    {
 
-        $file_name = $this->entity()->numberFormatter().'.pdf';
-
-        $file = (new \App\Jobs\Entity\CreateRawPdf($this->invitation()))->handle();
-
-        $headers = ['Content-Type' => 'application/pdf'];
-
-        return response()->streamDownload(function () use ($file) {
-            echo $file;
-        }, $file_name, $headers);
-
-    }
 
     public function downloadEDocument()
     {

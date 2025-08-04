@@ -476,3 +476,12 @@ This should resolve the corrupted package cache issue and allow the installation
 } 
 
 sudo ./backup-invoiceninja.sh 
+
+
+php artisan schedule:list
+
+
+[ec2-user@ip-10-0-1-26 log]$ crontab -l
+* * * * * cd /var/www/html && sudo /usr/bin/php artisan schedule:run >> /var/log/job-invoiceninja.log 2>&1
+
+0 1 * * * sudo /var/www/html/aws-deploy/scripts/backup-invoiceninja.sh > /var/log/backup-invoiceninja.log 2>&1
