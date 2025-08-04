@@ -41,3 +41,6 @@ _ide_helper.php
 /composer.phar
 .tx/
 .phpunit.cache
+aws-deploy-demo/terraform/.terraform.lock.hcl
+aws-deploy-demo/.deployment-info
+aws-deploy-demo/terraform/terraform.tfstate.backup
