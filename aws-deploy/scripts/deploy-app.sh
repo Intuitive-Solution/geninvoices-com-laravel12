@@ -85,7 +85,16 @@ else
     cd $APP_DIR
     git fetch origin
     git checkout $BRANCH
-    git pull origin $BRANCH
+    
+    # Force reset to match remote branch exactly (discard all local changes)
+    log "Discarding local changes and forcing update from remote..."
+    git reset --hard origin/$BRANCH
+    
+    # Clean untracked files
+    log "Cleaning untracked files..."
+    git clean -fd
+    
+    log "✓ Successfully updated repository from remote"
 fi
 
 # Copy environment file FIRST

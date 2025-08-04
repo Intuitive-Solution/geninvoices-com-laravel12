@@ -44,7 +44,7 @@ SCRIPTS_DIR="$SCRIPT_DIR/scripts"
 CONFIG_DIR="$SCRIPT_DIR/config"
 
 # Default values
-DEPLOY_MODE="full"  # full, infra-only, app-only
+DEPLOY_MODE="full"  # full, infra-only, app-only, app-install
 BRANCH="master"
 SKIP_CONFIRMATION=false
 
@@ -66,7 +66,7 @@ while [[ $# -gt 0 ]]; do
         --help)
             echo "Usage: $0 [OPTIONS]"
             echo "Options:"
-            echo "  --mode MODE              Deployment mode: full, infra-only, app-only (default: full)"
+            echo "  --mode MODE              Deployment mode: full, infra-only, app-only, app-install (default: full)"
             echo "  --branch BRANCH          Git branch to deploy (default: v5-stable)"
             echo "  --skip-confirmation      Skip confirmation prompts"
             echo "  --help                   Show this help message"
@@ -79,8 +79,8 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Validate deployment mode
-if [[ ! "$DEPLOY_MODE" =~ ^(full|infra-only|app-only)$ ]]; then
-    error "Invalid deployment mode: $DEPLOY_MODE. Must be one of: full, infra-only, app-only"
+if [[ ! "$DEPLOY_MODE" =~ ^(full|infra-only|app-only|app-install)$ ]]; then
+    error "Invalid deployment mode: $DEPLOY_MODE. Must be one of: full, infra-only, app-only, app-install"
 fi
 
 # Check prerequisites
@@ -248,6 +248,29 @@ deploy_application() {
     log "✓ Application deployed successfully"
 }
 
+# Install application code only (lightweight deployment)
+install_application_code() {
+    header "INSTALLING APPLICATION CODE"
+    
+    if [[ -z "$INSTANCE_IP" ]]; then
+        if [[ -f "$SCRIPT_DIR/.deployment-info" ]]; then
+            source "$SCRIPT_DIR/.deployment-info"
+        else
+            error "Instance IP not found. Please deploy infrastructure first."
+        fi
+    fi
+    
+    # Copy lightweight deployment script to instance
+    log "Copying lightweight deployment script to instance..."
+    scp -o StrictHostKeyChecking=no "$SCRIPTS_DIR/deploy-app-install.sh" ec2-user@$INSTANCE_IP:/tmp/
+    
+    # Deploy application code only
+    log "Installing application code..."
+    ssh -o StrictHostKeyChecking=no ec2-user@$INSTANCE_IP "chmod +x /tmp/deploy-app-install.sh && /tmp/deploy-app-install.sh '$BRANCH'"
+    
+    log "✓ Application code installed successfully"
+}
+
 # Verify deployment
 verify_deployment() {
     header "VERIFYING DEPLOYMENT"
@@ -336,6 +359,11 @@ main() {
         "app-only")
             wait_for_instance
             deploy_application
+            verify_deployment
+            ;;
+        "app-install")
+            wait_for_instance
+            install_application_code
             verify_deployment
             ;;
     esac

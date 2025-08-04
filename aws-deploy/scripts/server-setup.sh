@@ -130,7 +130,7 @@ PHP_INI="/etc/php.ini"
 sed -i 's/upload_max_filesize = 2M/upload_max_filesize = 100M/' $PHP_INI
 sed -i 's/post_max_size = 8M/post_max_size = 100M/' $PHP_INI
 sed -i 's/max_execution_time = 30/max_execution_time = 300/' $PHP_INI
-sed -i 's/memory_limit = 128M/memory_limit = 512M/' $PHP_INI
+sed -i 's/memory_limit = 128M/memory_limit = 1024M/' $PHP_INI
 sed -i 's/;date.timezone =/date.timezone = UTC/' $PHP_INI
 
 # Install Nginx
@@ -243,7 +243,7 @@ server {
     add_header X-XSS-Protection "1; mode=block" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "no-referrer-when-downgrade" always;
-    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline'" always;
+    add_header Content-Security-Policy "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';";
 }
 EOF
 
