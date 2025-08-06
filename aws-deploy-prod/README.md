@@ -492,5 +492,93 @@ sudo yum install -y google-chrome-stable_current_x86_64.rpm
 # Path will be:
 SNAPPDF_CHROMIUM_PATH="/usr/bin/google-chrome"
 
-# Fix the Permission Issue
-sudo chown -R ec2-user:ec2-user /var/www/html/storage/ && sudo chmod -R 775 /var/www/html/storage/
+
+## Fix permission  
+
+# Check the current PHP-FPM user configuration
+sudo cat /etc/php-fpm.d/www.conf | grep -E "(user|group)"
+
+# Edit the PHP-FPM configuration
+sudo nano /etc/php-fpm.d/www.conf
+
+; Change from:
+user = ec2-user
+group = ec2-user
+
+; To:
+user = nginx
+group = nginx
+
+# Check if nginx user exists
+id nginx
+
+# If nginx user doesn't exist, create it
+sudo useradd -r -s /bin/false nginx
+
+
+# Remove all cache directories and recreate them with proper ownership
+sudo rm -rf storage/framework/cache/data/*
+sudo rm -rf storage/framework/sessions/*
+sudo rm -rf storage/framework/views/*
+
+# Set proper ownership for the entire storage directory
+sudo chown -R nginx:nginx storage/
+sudo chmod -R 775 storage/
+
+# Set proper ownership for bootstrap/cache
+sudo chown -R nginx:nginx bootstrap/
+sudo chmod -R 775 bootstrap/
+
+# Restart PHP-FPM to apply the new user configuration
+sudo systemctl restart php-fpm
+
+# Verify the change
+ps -ef | grep php-fpm
+
+# Create cache directories as nginx user
+sudo -u nginx mkdir -p storage/framework/cache/data
+sudo -u nginx mkdir -p storage/framework/sessions
+sudo -u nginx mkdir -p storage/framework/views
+sudo -u nginx mkdir -p storage/logs
+sudo -u nginx mkdir -p bootstrap/cache
+
+# Clear all caches as nginx user
+sudo -u nginx php artisan cache:clear
+sudo -u nginx php artisan config:clear
+sudo -u nginx php artisan route:clear
+sudo -u nginx php artisan view:clear
+
+# Regenerate caches as nginx user
+sudo -u nginx php artisan config:cache
+sudo -u nginx php artisan route:cache
+sudo -u nginx php artisan view:cache
+
+# Check the ownership of cache directories
+ls -la storage/framework/cache/data/
+ls -la storage/framework/sessions/
+ls -la storage/framework/views/
+ls -la storage/logs/
+ls -la bootstrap/cache/
+
+# Test if nginx can write to cache directories
+sudo -u nginx touch storage/framework/cache/data/test.txt
+sudo -u nginx rm storage/framework/cache/data/test.txt
+
+sudo -u nginx touch storage/logs/test.log
+sudo -u nginx rm storage/logs/test.log
+
+
+# Restart services
+sudo systemctl restart php-fpm
+sudo systemctl restart nginx
+
+# Test login 
+curl -X POST https://api.geninvoices.com/api/v1/login \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{
+    "email": "bala@suntechnologies.com",
+    "password": "SuperSecret123",
+    "one_time_password": "",
+    "secret": ""
+  }'
