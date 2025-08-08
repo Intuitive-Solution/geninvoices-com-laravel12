@@ -166,7 +166,13 @@ class InvoiceItemSumInclusive
 
     private function sumLineItem()
     {
-        $this->setLineTotal($this->item->cost * $this->item->quantity);
+        // For resources/services (type_id = 2), include billable_time in the calculation
+        if ($this->item->type_id == 2) { // Service/Resource type
+            $this->setLineTotal($this->item->cost * ($this->item->quantity * ($this->item->billable_time ?? 1)));
+        } else {
+            // For products and other types, use the original calculation
+            $this->setLineTotal($this->item->cost * $this->item->quantity);
+        }
 
         return $this;
     }

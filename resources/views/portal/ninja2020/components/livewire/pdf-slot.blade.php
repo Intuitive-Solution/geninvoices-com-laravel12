@@ -1,5 +1,3 @@
-
-
 <div>
   <div class="flex flex-row space-x-2 float-right mb-2" x-data>
     <button 
@@ -20,16 +18,11 @@
     <button 
         wire:loading.attr="disabled" 
         wire:click="downloadEDocument" 
-        onclick="console.log('E-Invoice Download Button Clicked'); console.log('Entity Type: {{ $entity_type }}'); console.log('Timestamp:', new Date().toISOString());"
         class="button bg-primary text-white px-4 py-4 lg:px-2 lg:py-2 rounded flex items-center space-x-2" 
         type="button"
     >
         <span>{{ ctrans('texts.download_e_invoice') }}</span>
-        <div 
-            wire:loading 
-            wire:target="downloadEDocument"
-            onclick="console.log('E-Invoice Loading State Started'); console.log('Loading Target: downloadEDocument');"
-        >
+        <div wire:loading wire:target="downloadEDocument">
             <svg class="animate-spin h-5 w-5 text-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -37,75 +30,45 @@
         </div>
     </button>
     @endif
-      @if($entity_type == 'credit' && $settings->enable_e_invoice)
-          <button 
-              wire:loading.attr="disabled" 
-              wire:click="downloadEDocument" 
-              onclick="console.log('E-Credit Download Button Clicked'); console.log('Entity Type: {{ $entity_type }}'); console.log('Timestamp:', new Date().toISOString());"
-              class="button bg-primary text-white px-4 py-4 lg:px-2 lg:py-2 rounded flex items-center space-x-2" 
-              type="button"
-          >
-              <span>{{ ctrans('texts.download_e_credit') }}</span>
-              <div 
-                  wire:loading 
-                  wire:target="downloadEDocument"
-                  onclick="console.log('E-Credit Loading State Started'); console.log('Loading Target: downloadEDocument');"
-              >
-                  <svg class="animate-spin h-5 w-5 text-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-              </div>
-          </button>
-      @endif
-      @if($entity_type == 'quote' && $settings->enable_e_invoice)
-          <button 
-              wire:loading.attr="disabled" 
-              wire:click="downloadEDocument" 
-              onclick="console.log('E-Quote Download Button Clicked'); console.log('Entity Type: {{ $entity_type }}'); console.log('Timestamp:', new Date().toISOString());"
-              class="button bg-primary text-white px-4 py-4 lg:px-2 lg:py-2 rounded flex items-center space-x-2" 
-              type="button"
-          >
-              <span>{{ ctrans('texts.download_e_quote') }}</span>
-              <div 
-                  wire:loading 
-                  wire:target="downloadEDocument"
-                  onclick="console.log('E-Quote Loading State Started'); console.log('Loading Target: downloadEDocument');"
-              >
-                  <svg class="animate-spin h-5 w-5 text-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-              </div>
-          </button>
-      @endif
-{{--      Not implemented yet--}}
-{{--      @if($entity_type == 'purchase_order' && $settings->enable_e_invoice)
-          <button wire:loading.attr="disabled" wire:click="downloadEInvoice" class="button bg-primary text-white px-4 py-4 lg:px-2 lg:py-2 rounded" type="button">
-              <span>{{ ctrans('texts.download_e_invoice') }}</span>
-              <div wire:loading wire:target="downloadEInvoice">
-                  <svg class="animate-spin h-5 w-5 text-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-              </div>
-          </button>
-      @endif--}}
-  </div>
-  @if($html_entity_option)
-  <div class="hidden lg:block">
-  @else
-  <div>
-  @endif
-    <div 
-        wire:init="getPdf()"
-    >
-        <div 
-            class="flex mt-4 place-items-center" 
-            id="loader" 
-            wire:ignore
-        >
 
+    @if($entity_type == 'credit' && $settings->enable_e_invoice)
+    <button 
+        wire:loading.attr="disabled" 
+        wire:click="downloadEDocument" 
+        class="button bg-primary text-white px-4 py-4 lg:px-2 lg:py-2 rounded flex items-center space-x-2" 
+        type="button"
+    >
+        <span>{{ ctrans('texts.download_e_credit') }}</span>
+        <div wire:loading wire:target="downloadEDocument">
+            <svg class="animate-spin h-5 w-5 text-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+    </button>
+    @endif
+
+    @if($entity_type == 'quote' && $settings->enable_e_invoice)
+    <button 
+        wire:loading.attr="disabled" 
+        wire:click="downloadEDocument" 
+        class="button bg-primary text-white px-4 py-4 lg:px-2 lg:py-2 rounded flex items-center space-x-2" 
+        type="button"
+    >
+        <span>{{ ctrans('texts.download_e_quote') }}</span>
+        <div wire:loading wire:target="downloadEDocument">
+            <svg class="animate-spin h-5 w-5 text-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+    </button>
+    @endif
+  </div>
+
+  <div class="@if($html_entity_option) hidden lg:block @endif">    
+    <div wire:init="getPdf()">
+        <div class="flex mt-4 place-items-center" id="loader" wire:ignore>
             <span class="loader m-auto" wire:ignore></span>
             <style type="text/css">
             .loader {
@@ -154,84 +117,75 @@
   </div>
   @endif
 
-</div>
-
-<script type="text/javascript">
-
-// Track iframe loading
-waitForElement("#pdf-iframe", 0).then(function(){
-    const iframe = document.getElementById("pdf-iframe");
-
-    iframe.addEventListener("load", function () {
-        const loader = document.getElementById("loader")
-        loader.classList.add("hidden");
-    });
-
-    iframe.addEventListener("error", function (event) {
-        const loader = document.getElementById("loader");
-        if (loader) {
-            loader.innerHTML = '<div class="text-red-500 text-center"><p>Failed to load PDF.</p><p>Please try refreshing the page.</p></div>';
-        }
-    });
-});
-
-// Show progress indicator after 5 seconds
-setTimeout(function() {
-    const loader = document.getElementById("loader");
-    if (loader && !document.getElementById("pdf-iframe")) {
-        loader.innerHTML = '<div class="text-blue-500 text-center"><p>Generating PDF...</p><p>This may take a few moments.</p></div>';
-    }
-}, 5000);
-
-// Track iframe timeout
-waitForElement("#pdf-iframe", 60000).catch(function(){
-    const loader = document.getElementById("loader");
-    if (loader) {
-        loader.innerHTML = '<div class="text-red-500 text-center"><p>PDF generation is taking longer than expected.</p><p>Please try refreshing the page or contact support if the issue persists.</p></div>';
-    }
-});
-
-function waitForElement(querySelector, timeout){
-    return new Promise((resolve, reject)=>{
-        var timer = false;
-        if(document.querySelectorAll(querySelector).length) {
-            return resolve();
-        }
-        const observer = new MutationObserver(()=>{
-            if(document.querySelectorAll(querySelector).length){
-                observer.disconnect();
-                if(timer !== false) clearTimeout(timer);
-                return resolve();
+    <script type="text/javascript">
+    // All the JavaScript code stays the same...
+    waitForElement("#pdf-iframe", 0).then(function(){
+        const iframe = document.getElementById("pdf-iframe");
+        iframe.addEventListener("load", function () {
+            const loader = document.getElementById("loader")
+            loader.classList.add("hidden");
+        });
+        iframe.addEventListener("error", function (event) {
+            const loader = document.getElementById("loader");
+            if (loader) {
+                loader.innerHTML = '<div class="text-red-500 text-center"><p>Failed to load PDF.</p><p>Please try refreshing the page.</p></div>';
             }
         });
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        if(timeout) timer = setTimeout(()=>{
-            observer.disconnect();
-            reject();
-        }, timeout);
     });
-}
 
-// Function to download PDF file
-function downloadPdfFile(pdfHash, routeEntity, filename) {
-    if (!pdfHash) {
-        alert('PDF is not ready yet. Please wait for the PDF to load and try again.');
-        return;
+    setTimeout(function() {
+        const loader = document.getElementById("loader");
+        if (loader && !document.getElementById("pdf-iframe")) {
+            loader.innerHTML = '<div class="text-blue-500 text-center"><p>Generating PDF...</p><p>This may take a few moments.</p></div>';
+        }
+    }, 5000);
+
+    waitForElement("#pdf-iframe", 60000).catch(function(){
+        const loader = document.getElementById("loader");
+        if (loader) {
+            loader.innerHTML = '<div class="text-red-500 text-center"><p>PDF generation is taking longer than expected.</p><p>Please try refreshing the page or contact support if the issue persists.</p></div>';
+        }
+    });
+
+    function waitForElement(querySelector, timeout){
+        return new Promise((resolve, reject)=>{
+            var timer = false;
+            if(document.querySelectorAll(querySelector).length) {
+                return resolve();
+            }
+            const observer = new MutationObserver(()=>{
+                if(document.querySelectorAll(querySelector).length){
+                    observer.disconnect();
+                    if(timer !== false) clearTimeout(timer);
+                    return resolve();
+                }
+            });
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            if(timeout) timer = setTimeout(()=>{
+                observer.disconnect();
+                reject();
+            }, timeout);
+        });
     }
-    
-    // Create a temporary link to trigger download
-    const url = `/${routeEntity}/showBlob/${pdfHash}?download=1`;
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    link.style.display = 'none';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
 
+    function downloadPdfFile(pdfHash, routeEntity, filename) {
+        if (!pdfHash) {
+            alert('PDF is not ready yet. Please wait for the PDF to load and try again.');
+            return;
+        }
+        
+        const url = `/${routeEntity}/showBlob/${pdfHash}?download=1`;
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 </script>
+</div>
