@@ -117,12 +117,17 @@ mkdir -p $APP_DIR/storage/framework/views
 mkdir -p $APP_DIR/storage/logs
 
 # Set storage permissions
-chown -R ec2-user:ec2-user $APP_DIR/storage
-chmod -R 775 $APP_DIR/storage
+sudo chown -R nginx:nginx $APP_DIR/storage
+sudo chmod -R 775 $APP_DIR/storage
+
+# Set bootstrap/cache permissions
+sudo mkdir -p $APP_DIR/bootstrap/cache
+sudo chown -R nginx:nginx $APP_DIR/bootstrap/cache
+sudo chmod -R 775 $APP_DIR/bootstrap/cache
 
 # Install Composer dependencies AFTER storage setup
 log "Installing Composer dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction
+sudo -u nginx composer install --no-dev --optimize-autoloader --no-interaction
 
 # Configure environment variables
 log "Configuring environment variables..."
@@ -143,7 +148,7 @@ fi
 # Generate application key if not provided
 if [ -z "$APP_KEY" ]; then
     log "Generating application key..."
-    php artisan key:generate --force
+    sudo -u nginx php artisan key:generate --force
 else
     log "Setting provided application key..."
     sed -i "s/APP_KEY=.*/APP_KEY=$APP_KEY/" "$APP_DIR/.env"
@@ -156,41 +161,41 @@ sed -i "s/QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/" "$APP_DIR/.env"
 
 # Set proper permissions
 log "Setting file permissions..."
-chown -R ec2-user:ec2-user $APP_DIR
-chmod -R 755 $APP_DIR
-chmod -R 775 $APP_DIR/storage
-chmod -R 775 $APP_DIR/bootstrap/cache
+sudo chown -R nginx:nginx $APP_DIR
+sudo chmod -R 755 $APP_DIR
+sudo chmod -R 775 $APP_DIR/storage
+sudo chmod -R 775 $APP_DIR/bootstrap/cache
 
 # Create symbolic link for storage
 log "Creating storage symbolic link..."
 if [ ! -L "$APP_DIR/public/storage" ]; then
-    php artisan storage:link
+    sudo -u nginx php artisan storage:link
 fi
 
 # Run database migrations
 log "Running database migrations..."
-php artisan migrate --force
+sudo -u nginx php artisan migrate --force
 
 
 # Check if this is a fresh installation
 TABLES_COUNT=$(mysql -u invoiceninja -p"$DB_PASSWORD" -D invoiceninja -e "SHOW TABLES;" | wc -l)
 if [ "$TABLES_COUNT" -le 1 ]; then
     log "Fresh installation detected, running database seeder..."
-    php artisan db:seed --force
+    sudo -u nginx php artisan db:seed --force
 fi
 
 # Clear all caches
 log "Clearing application caches..."
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-php artisan cache:clear
+sudo -u nginx php artisan config:clear
+sudo -u nginx php artisan route:clear
+sudo -u nginx php artisan view:clear
+sudo -u nginx php artisan cache:clear
 
 # Optimize application for production
 log "Optimizing application for production..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+sudo -u nginx php artisan config:cache
+sudo -u nginx php artisan route:cache
+sudo -u nginx php artisan view:cache
 
 # Install and build frontend assets (if package.json exists)
 if [ -f "$APP_DIR/package.json" ]; then
@@ -201,10 +206,10 @@ fi
 
 # Set final permissions
 log "Setting final permissions..."
-chown -R ec2-user:ec2-user $APP_DIR
-chmod -R 755 $APP_DIR
-chmod -R 775 $APP_DIR/storage
-chmod -R 775 $APP_DIR/bootstrap/cache
+sudo chown -R nginx:nginx $APP_DIR
+sudo chmod -R 755 $APP_DIR
+sudo chmod -R 775 $APP_DIR/storage
+sudo chmod -R 775 $APP_DIR/bootstrap/cache
 
 # Restart services
 log "Restarting services..."

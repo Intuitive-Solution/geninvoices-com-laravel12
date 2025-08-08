@@ -72,7 +72,7 @@ else
 fi
 
 # Set proper ownership
-chown -R ec2-user:ec2-user "$APP_DIR"
+chown -R nginx:nginx "$APP_DIR"
 
 log "✓ Git authentication issue resolved and repository cloned"
 log "Application directory: $APP_DIR"

@@ -253,7 +253,7 @@ rm -f /etc/nginx/conf.d/default.conf
 # Create application directory
 log "Creating application directory..."
 mkdir -p /var/www/html
-chown -R ec2-user:ec2-user /var/www/html
+chown -R nginx:nginx /var/www/html
 chmod -R 755 /var/www/html
 
 # Configure firewall (if firewalld is installed)
@@ -353,7 +353,7 @@ composer install --no-dev --optimize-autoloader
 
 # Set permissions
 log "Setting permissions..."
-chown -R ec2-user:ec2-user $APP_DIR
+chown -R nginx:nginx $APP_DIR
 chmod -R 755 $APP_DIR
 chmod -R 775 $APP_DIR/storage
 chmod -R 775 $APP_DIR/bootstrap/cache

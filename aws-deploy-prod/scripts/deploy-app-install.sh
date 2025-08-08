@@ -42,48 +42,61 @@ log "App Directory: $APP_DIR"
 # Navigate to application directory
 cd $APP_DIR
 
+# Switch to nginx user for Git operations to avoid permission issues
+log "Switching to nginx user for Git operations..."
+sudo -u nginx bash << 'NGINX_GIT_SCRIPT'
+cd /var/www/html
+
 # Update repository and fetch new changes
-log "Fetching new changes from repository..."
+echo "Fetching new changes from repository..."
 git fetch origin
 git checkout $BRANCH
 
 # Force reset to match remote branch exactly (discard all local changes)
-log "Discarding local changes and forcing update from remote..."
+echo "Discarding local changes and forcing update from remote..."
 git reset --hard origin/$BRANCH
 
 # Clean untracked files
-log "Cleaning untracked files..."
+echo "Cleaning untracked files..."
 git clean -fd
 
-log "✓ Successfully updated repository from remote"
+echo "✓ Successfully updated repository from remote"
+NGINX_GIT_SCRIPT
 
-# Install Composer dependencies
+# Set proper permissions BEFORE Composer install
+log "Setting file permissions for Composer..."
+sudo chown -R nginx:nginx $APP_DIR
+sudo chmod -R 755 $APP_DIR
+sudo chmod -R 775 $APP_DIR/storage
+sudo chmod -R 775 $APP_DIR/bootstrap/cache
+
+# Install Composer dependencies as nginx user
 log "Installing Composer dependencies..."
-composer install --no-dev --optimize-autoloader --no-interaction
+sudo -u nginx composer install --no-dev --optimize-autoloader --no-interaction
 
 # Run database migrations
 log "Running database migrations..."
-php artisan migrate --force
+sudo -u nginx php artisan migrate --force
 
 # Clear all caches
 log "Clearing application caches..."
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
-php artisan cache:clear
+sudo -u nginx php artisan config:clear
+sudo -u nginx php artisan route:clear
+sudo -u nginx php artisan view:clear
+sudo -u nginx php artisan cache:clear
 
 # Optimize application for production
 log "Optimizing application for production..."
-php artisan config:cache
-php artisan route:cache
-php artisan view:cache
+sudo -u nginx php artisan config:cache
+sudo -u nginx php artisan route:cache
+sudo -u nginx php artisan view:cache
 
-# Set proper permissions
+# Set proper permissions - change ownership to nginx:nginx
 log "Setting file permissions..."
-chown -R ec2-user:ec2-user $APP_DIR
-chmod -R 755 $APP_DIR
-chmod -R 775 $APP_DIR/storage
-chmod -R 775 $APP_DIR/bootstrap/cache
+sudo chown -R nginx:nginx $APP_DIR
+sudo chmod -R 755 $APP_DIR
+sudo chmod -R 775 $APP_DIR/storage
+sudo chmod -R 775 $APP_DIR/bootstrap/cache
 
 # Restart services
 log "Restarting services..."
@@ -98,7 +111,7 @@ else
     warn "Web server may not be responding correctly"
 fi
 
-if php artisan --version >/dev/null 2>&1; then
+if sudo -u nginx php artisan --version >/dev/null 2>&1; then
     log "✓ Laravel application is working"
 else
     error "Laravel application is not working correctly"

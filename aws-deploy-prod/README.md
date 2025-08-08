@@ -98,6 +98,11 @@ Deploys only the application (requires existing infrastructure):
 ./deploy.sh --mode app-only
 ```
 
+### Application Only
+Deploys only the application (requires existing infrastructure):
+```bash
+./deploy.sh --mode app-install
+
 ## Advanced Options
 
 ### Deploy Specific Branch
