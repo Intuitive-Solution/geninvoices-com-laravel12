@@ -378,6 +378,9 @@ trait MakesInvoiceValues
             // Handle hours field for resources (tasks) - map to quantity
             if ($table_type == '$task') {
                 $data[$key][$table_type.'.hours'] = $data[$key][$table_type.'.quantity'];
+                
+                // Handle rate field for tasks - map to cost
+                $data[$key][$table_type.'.rate'] = $data[$key][$table_type.'.unit_cost'];
             }
         }
 
