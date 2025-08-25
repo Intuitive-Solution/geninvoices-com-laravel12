@@ -47,24 +47,51 @@ log "Switching to nginx user for Git operations..."
 sudo -u nginx bash << 'NGINX_GIT_SCRIPT'
 cd /var/www/html
 
-# Update repository and fetch new changes
-echo "Fetching new changes from repository..."
-git fetch origin
+# Ensure we're on the correct branch and pull latest changes
+echo "Pulling latest changes from repository..."
 git checkout $BRANCH
 
-# Force reset to match remote branch exactly (discard all local changes)
-echo "Discarding local changes and forcing update from remote..."
-git reset --hard origin/$BRANCH
-
-# Clean untracked files
-echo "Cleaning untracked files..."
+# Force reset to discard any local changes that might conflict
+echo "Discarding local changes to ensure clean pull..."
+git reset --hard HEAD
 git clean -fd
+
+# Now pull the latest changes
+git pull origin $BRANCH
+
+# Clean any remaining untracked files (preserve .env)
+echo "Cleaning remaining untracked files..."
+git clean -fd
+
+# Verify we have the latest commit
+echo "Current commit: $(git rev-parse HEAD)"
+echo "Latest remote commit: $(git rev-parse origin/$BRANCH 2>/dev/null || echo 'Branch not found')"
 
 echo "✓ Successfully updated repository from remote"
 NGINX_GIT_SCRIPT
 
+# Verify we have the latest changes
+log "Verifying latest changes..."
+sudo -u nginx bash << 'VERIFY_SCRIPT'
+cd /var/www/html
+echo "Current commit hash: $(git rev-parse HEAD)"
+echo "Latest remote commit: $(git rev-parse origin/$BRANCH 2>/dev/null || echo 'Branch not found')"
+echo "Last commit message: $(git log -1 --pretty=format:'%s')"
+echo "Last commit date: $(git log -1 --pretty=format:'%cd')"
+VERIFY_SCRIPT
+
 # Set proper permissions BEFORE Composer install
 log "Setting file permissions for Composer..."
+
+# Create necessary directories first
+sudo mkdir -p $APP_DIR/storage/app/public
+sudo mkdir -p $APP_DIR/storage/framework/cache
+sudo mkdir -p $APP_DIR/storage/framework/sessions
+sudo mkdir -p $APP_DIR/storage/framework/views
+sudo mkdir -p $APP_DIR/storage/logs
+sudo mkdir -p $APP_DIR/bootstrap/cache
+
+# Set ownership and permissions
 sudo chown -R nginx:nginx $APP_DIR
 sudo chmod -R 755 $APP_DIR
 sudo chmod -R 775 $APP_DIR/storage
@@ -93,6 +120,16 @@ sudo -u nginx php artisan view:cache
 
 # Set proper permissions
 log "Setting file permissions..."
+
+# Ensure directories exist
+sudo mkdir -p $APP_DIR/storage/app/public
+sudo mkdir -p $APP_DIR/storage/framework/cache
+sudo mkdir -p $APP_DIR/storage/framework/sessions
+sudo mkdir -p $APP_DIR/storage/framework/views
+sudo mkdir -p $APP_DIR/storage/logs
+sudo mkdir -p $APP_DIR/bootstrap/cache
+
+# Set ownership and permissions
 sudo chown -R nginx:nginx $APP_DIR
 sudo chmod -R 755 $APP_DIR
 sudo chmod -R 775 $APP_DIR/storage

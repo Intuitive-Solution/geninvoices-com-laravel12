@@ -148,7 +148,8 @@ aws s3 cp "$COMPRESSED_DB_FILE" "s3://$S3_BUCKET/$DB_S3_KEY" \
 if [ $? -eq 0 ]; then
     log "Successfully uploaded database backup to s3://$S3_BUCKET/$DB_S3_KEY"
 else
-    error "Failed to upload database backup to S3"
+    warn "Failed to upload database backup to S3 - check IAM permissions"
+    warn "Local backup is still available at: $COMPRESSED_DB_FILE"
 fi
 
 # Upload .env file to S3
@@ -162,7 +163,8 @@ aws s3 cp "$ENV_BACKUP_FILE" "s3://$S3_BUCKET/$ENV_S3_KEY" \
 if [ $? -eq 0 ]; then
     log "Successfully uploaded .env backup to s3://$S3_BUCKET/$ENV_S3_KEY"
 else
-    error "Failed to upload .env backup to S3"
+    warn "Failed to upload .env backup to S3 - check IAM permissions"
+    warn "Local .env backup is still available at: $ENV_BACKUP_FILE"
 fi
 
 # Create backup manifest
@@ -208,7 +210,12 @@ MANIFEST_S3_KEY="$S3_PREFIX/$DATE_FOLDER/backup_manifest_$TIMESTAMP.txt"
 aws s3 cp "$MANIFEST_FILE" "s3://$S3_BUCKET/$MANIFEST_S3_KEY" \
     --metadata "backup-date=$TIMESTAMP,application=invoiceninja,type=manifest"
 
-log "Backup manifest uploaded to s3://$S3_BUCKET/$MANIFEST_S3_KEY"
+if [ $? -eq 0 ]; then
+    log "Backup manifest uploaded to s3://$S3_BUCKET/$MANIFEST_S3_KEY"
+else
+    warn "Failed to upload backup manifest to S3 - check IAM permissions"
+    warn "Local manifest is still available at: $MANIFEST_FILE"
+fi
 
 # Cleanup old local backups
 log "Cleaning up old local backups (older than $RETENTION_DAYS days)..."
