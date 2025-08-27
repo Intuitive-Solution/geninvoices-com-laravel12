@@ -643,6 +643,14 @@ class Company extends BaseModel
         return $this->hasMany(Resource::class)->withTrashed();
     }
 
+    /**
+     * @return HasMany
+     */
+    public function employees()
+    {
+        return $this->hasMany(Employee::class)->withTrashed();
+    }
+
     public function country()
     {
 

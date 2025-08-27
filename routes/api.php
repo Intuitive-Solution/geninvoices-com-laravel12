@@ -12,6 +12,7 @@
 */
 use App\Http\Controllers\EInvoicePeppolController;
 use App\Http\Controllers\EInvoiceTokenController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\SubscriptionStepsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BaseController;
@@ -257,6 +258,9 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
 
     Route::resource('expense_categories', ExpenseCategoryController::class); // name = (expense_categories. index / create / show / update / destroy / edit
     Route::post('expense_categories/bulk', [ExpenseCategoryController::class, 'bulk'])->name('expense_categories.bulk');
+
+    Route::resource('employees', EmployeeController::class); // name = (employees. index / create / show / update / destroy / edit
+    Route::post('employees/bulk', [EmployeeController::class, 'bulk'])->name('employees.bulk');
 
     Route::resource('group_settings', GroupSettingController::class);
     Route::post('group_settings/bulk', [GroupSettingController::class, 'bulk']);

@@ -22,6 +22,7 @@ use App\Models\CompanyToken;
 use App\Models\Credit;
 use App\Models\Design;
 use App\Models\Document;
+use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\GroupSetting;
@@ -54,6 +55,7 @@ use App\Policies\CompanyTokenPolicy;
 use App\Policies\CreditPolicy;
 use App\Policies\DesignPolicy;
 use App\Policies\DocumentPolicy;
+use App\Policies\EmployeePolicy;
 use App\Policies\ExpenseCategoryPolicy;
 use App\Policies\ExpensePolicy;
 use App\Policies\GroupSettingPolicy;
@@ -97,6 +99,7 @@ class AuthServiceProvider extends ServiceProvider
         Credit::class => CreditPolicy::class,
         Design::class => DesignPolicy::class,
         Document::class => DocumentPolicy::class,
+        Employee::class => EmployeePolicy::class,
         Expense::class => ExpensePolicy::class,
         ExpenseCategory::class => ExpenseCategoryPolicy::class,
         GroupSetting::class => GroupSettingPolicy::class,
