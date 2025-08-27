@@ -32,7 +32,6 @@ class EmployeeTransformer extends EntityTransformer
             'department' => $employee->department ?: '',
             'designation' => $employee->designation ?: '',
             'email' => $employee->email ?: '',
-            'status' => $employee->status,
             'is_deleted' => (bool) $employee->is_deleted,
             'user_id' => $this->encodePrimaryKey($employee->user_id),
             'created_at' => (int) $employee->created_at,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Factory\EmployeeFactory;
 use App\Filters\EmployeeFilters;
+use App\Http\Requests\Employee\BulkEmployeeRequest;
 use App\Http\Requests\Employee\StoreEmployeeRequest;
 use App\Http\Requests\Employee\UpdateEmployeeRequest;
 use App\Models\Employee;
@@ -115,47 +116,25 @@ class EmployeeController extends BaseController
     /**
      * Perform bulk actions on the list view.
      *
+     * @param BulkEmployeeRequest $request
      * @return Response
      */
-    public function bulk()
+    public function bulk(BulkEmployeeRequest $request)
     {
-        $action = request()->input('action');
-        $ids = request()->input('ids');
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
 
-        $employees = Employee::withTrashed()->find($this->transformKeys($ids));
+        $action = $request->input('action');
+        $ids = $request->input('ids');
 
-        $employees->each(function ($employee, $key) use ($action) {
-            if (auth()->user()->can('edit', $employee)) {
-                $this->performAction($employee, $action, true);
+        $employees = Employee::withTrashed()->whereIn('id', $ids);
+
+        $employees->cursor()->each(function ($employee, $key) use ($action, $user) {
+            if ($user->can('edit', $employee)) {
+                $this->employee_repo->{$action}($employee);
             }
         });
 
-        return $this->listResponse(Employee::withTrashed()->whereIn('id', $this->transformKeys($ids)));
-    }
-
-    private function performAction(Employee $employee, string $action, bool $bulk = false)
-    {
-        switch ($action) {
-            case 'archive':
-                $employee->delete();
-                break;
-            case 'restore':
-                $employee->restore();
-                break;
-            case 'delete':
-                $employee->is_deleted = true;
-                $employee->save();
-                break;
-            case 'activate':
-                $employee->status = 'active';
-                $employee->save();
-                break;
-            case 'deactivate':
-                $employee->status = 'inactive';
-                $employee->save();
-                break;
-            default:
-                return;
-        }
+        return $this->listResponse(Employee::withTrashed()->whereIn('id', $ids));
     }
 }

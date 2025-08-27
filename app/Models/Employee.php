@@ -19,7 +19,6 @@ use Laracasts\Presenter\PresentableTrait;
  * @property string $department
  * @property string $designation
  * @property string $email
- * @property string $status
  * @property bool $is_deleted
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
@@ -44,7 +43,6 @@ class Employee extends BaseModel
         'department',
         'designation',
         'email',
-        'status',
     ];
 
     protected $casts = [
@@ -78,23 +76,5 @@ class Employee extends BaseModel
 
 
 
-    public function scopeActive($query)
-    {
-        return $query->where('status', 'active');
-    }
 
-    public function scopeInactive($query)
-    {
-        return $query->where('status', 'inactive');
-    }
-
-    public function isActive(): bool
-    {
-        return $this->status === 'active';
-    }
-
-    public function isInactive(): bool
-    {
-        return $this->status === 'inactive';
-    }
 }

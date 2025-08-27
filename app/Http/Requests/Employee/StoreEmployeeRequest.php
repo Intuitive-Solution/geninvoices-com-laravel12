@@ -27,7 +27,6 @@ class StoreEmployeeRequest extends Request
             'department' => 'required|string|max:255',
             'designation' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:employees,email,NULL,id,company_id,' . auth()->user()->company()->id,
-            'status' => 'required|in:active,inactive',
         ];
 
         return $rules;

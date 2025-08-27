@@ -27,7 +27,6 @@ class UpdateEmployeeRequest extends Request
             'department' => 'sometimes|required|string|max:255',
             'designation' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|max:255|unique:employees,email,' . $this->employee->id . ',id,company_id,' . auth()->user()->company()->id,
-            'status' => 'sometimes|required|in:active,inactive',
         ];
 
         return $rules;

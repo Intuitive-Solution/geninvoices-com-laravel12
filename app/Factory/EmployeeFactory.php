@@ -16,7 +16,6 @@ class EmployeeFactory
         $employee->department = '';
         $employee->designation = '';
         $employee->email = '';
-        $employee->status = 'active';
         $employee->is_deleted = false;
 
         return $employee;

@@ -71,18 +71,38 @@ class EmployeeFilters extends QueryFilters
     }
 
     /**
-     * Filter by status.
+     * Filters the list based on the status
+     * archived, active, deleted.
+     * Overrides parent method to work with Employee model structure.
      *
-     * @param string $status
+     * @param string $filter
      * @return Builder
      */
-    public function status(string $status = ''): Builder
+    public function status(string $filter = ''): Builder
     {
-        if (strlen($status) == 0) {
+        if (strlen($filter) == 0) {
             return $this->builder;
         }
 
-        return $this->builder->where('status', $status);
+        $filters = explode(',', $filter);
+
+        return $this->builder->where(function ($query) use ($filters) {
+            if (in_array(self::STATUS_ACTIVE, $filters)) {
+                $query = $query->orWhere(function ($q) {
+                    $q->whereNull('deleted_at')->where('is_deleted', 0);
+                });
+            }
+
+            if (in_array(self::STATUS_ARCHIVED, $filters)) {
+                $query = $query->orWhere(function ($q) {
+                    $q->whereNotNull('deleted_at')->where('is_deleted', 0);
+                });
+            }
+
+            if (in_array(self::STATUS_DELETED, $filters)) {
+                $query = $query->orWhere('is_deleted', 1);
+            }
+        });
     }
 
     /**
