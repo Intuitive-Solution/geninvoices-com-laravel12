@@ -9,7 +9,7 @@ use Tests\TestCase;
 class EmployeeTransformerTest extends TestCase
 {
     /**
-     * Test that status field is not included in transformer output.
+     * Test that status field is not included in transformer output (using entity state pattern).
      */
     public function testStatusFieldNotIncludedInTransform()
     {
@@ -29,11 +29,15 @@ class EmployeeTransformerTest extends TestCase
         $employee->created_at = now();
         $employee->updated_at = now();
         $employee->deleted_at = null;
+        $employee->archived_at = null;
+        
+        // Ensure is_deleted is properly set as boolean
+        $employee->is_deleted = false;
         
         $transformer = new EmployeeTransformer();
         $result = $transformer->transform($employee);
         
-        // Assert that status field is not present in the result
+        // Assert that status field is not present (we use entity state pattern like vendors)
         $this->assertArrayNotHasKey('status', $result, 'Status field should not be present in transformer output');
     }
 
@@ -103,6 +107,7 @@ class EmployeeTransformerTest extends TestCase
         $employee->created_at = now();
         $employee->updated_at = now();
         $employee->deleted_at = null;
+        $employee->archived_at = null;
         
         $transformer = new EmployeeTransformer();
         $result = $transformer->transform($employee);
@@ -142,6 +147,7 @@ class EmployeeTransformerTest extends TestCase
         $employee->created_at = now();
         $employee->updated_at = now();
         $employee->deleted_at = null;
+        $employee->archived_at = null;
         
         $transformer = new EmployeeTransformer();
         $result = $transformer->transform($employee);
@@ -153,7 +159,141 @@ class EmployeeTransformerTest extends TestCase
         $this->assertEquals('', $result['designation'], 'Null designation should be empty string');
         $this->assertEquals('', $result['email'], 'Empty email should be empty string');
         
-        // Status field should still not be present
-        $this->assertArrayNotHasKey('status', $result, 'Status field should not be present even with empty values');
+        // Status field should not be present (we use entity state pattern)
+        $this->assertArrayNotHasKey('status', $result, 'Status field should not be present');
+    }
+
+    /**
+     * Test that archived_at field is properly formatted when null.
+     */
+    public function testArchivedAtFieldFormattingWhenNull()
+    {
+        // Create a mock Employee instance with null archived_at
+        $employee = new Employee([
+            'id' => 1,
+            'name' => 'John Doe',
+            'emp_id' => 'EMP001',
+            'department' => 'Engineering',
+            'designation' => 'Developer',
+            'email' => 'john@example.com',
+            'is_deleted' => false,
+            'user_id' => 1,
+        ]);
+        
+        // Set timestamps manually since we're not using the database
+        $employee->created_at = now();
+        $employee->updated_at = now();
+        $employee->deleted_at = null;
+        $employee->archived_at = null;
+        
+        $transformer = new EmployeeTransformer();
+        $result = $transformer->transform($employee);
+        
+        // Test that null archived_at is converted to 0
+        $this->assertEquals(0, $result['archived_at'], 'Null archived_at should be converted to 0');
+        $this->assertIsInt($result['archived_at'], 'archived_at should be an integer');
+    }
+
+    /**
+     * Test that archived_at field is properly formatted when set.
+     */
+    public function testArchivedAtFieldFormattingWhenSet()
+    {
+        // Create a mock Employee instance with set archived_at
+        $employee = new Employee([
+            'id' => 1,
+            'name' => 'John Doe',
+            'emp_id' => 'EMP001',
+            'department' => 'Engineering',
+            'designation' => 'Developer',
+            'email' => 'john@example.com',
+            'is_deleted' => false,
+            'user_id' => 1,
+        ]);
+        
+        // Set timestamps manually since we're not using the database
+        $archivedTime = now();
+        $employee->created_at = now();
+        $employee->updated_at = now();
+        $employee->deleted_at = null;
+        $employee->archived_at = $archivedTime;
+        
+        $transformer = new EmployeeTransformer();
+        $result = $transformer->transform($employee);
+        
+        // Test that archived_at timestamp is properly converted to integer
+        $this->assertEquals($archivedTime->timestamp, $result['archived_at'], 'archived_at should be converted to integer timestamp');
+        $this->assertIsInt($result['archived_at'], 'archived_at should be an integer');
+        $this->assertGreaterThan(0, $result['archived_at'], 'archived_at should be greater than 0 when set');
+    }
+
+    /**
+     * Test entity state for archived employee.
+     */
+    public function testEntityStateForArchivedEmployee()
+    {
+        // Create a mock Employee instance
+        $employee = new Employee([
+            'id' => 1,
+            'name' => 'John Doe',
+            'emp_id' => 'EMP001',
+            'department' => 'Engineering',
+            'designation' => 'Developer',
+            'email' => 'john@example.com',
+            'is_deleted' => false,
+            'user_id' => 1,
+        ]);
+        
+        // Set timestamps manually since we're not using the database
+        $employee->created_at = now();
+        $employee->updated_at = now();
+        $employee->deleted_at = null;
+        $employee->archived_at = now();
+        
+        $transformer = new EmployeeTransformer();
+        $result = $transformer->transform($employee);
+        
+        // Ensure status field is not included (we use entity state pattern)
+        $this->assertArrayNotHasKey('status', $result, 'Status field should not be included in API response');
+        
+        // archived_at should be included for entity state calculation
+        $this->assertArrayHasKey('archived_at', $result, 'archived_at field should be included in API response');
+        $this->assertGreaterThan(0, $result['archived_at'], 'Archived employee should have archived_at > 0');
+    }
+
+    /**
+     * Test entity state for deleted employee.
+     */
+    public function testEntityStateForDeletedEmployee()
+    {
+        // Create a mock Employee instance
+        $employee = new Employee([
+            'id' => 1,
+            'name' => 'John Doe',
+            'emp_id' => 'EMP001',
+            'department' => 'Engineering',
+            'designation' => 'Developer',
+            'email' => 'john@example.com',
+            'is_deleted' => true,
+            'user_id' => 1,
+        ]);
+        
+        // Set timestamps manually since we're not using the database
+        $employee->created_at = now();
+        $employee->updated_at = now();
+        $employee->deleted_at = now();
+        $employee->archived_at = null;
+        
+        // Ensure is_deleted is properly set as boolean
+        $employee->is_deleted = true;
+        
+        $transformer = new EmployeeTransformer();
+        $result = $transformer->transform($employee);
+        
+        // Ensure status field is not included (we use entity state pattern)
+        $this->assertArrayNotHasKey('status', $result, 'Status field should not be included in API response');
+        
+        // is_deleted should be included for entity state calculation
+        $this->assertTrue($result['is_deleted'], 'Deleted employee should have is_deleted = true');
     }
 }

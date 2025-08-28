@@ -39,7 +39,7 @@ class BaseRepository
      *
      * @return string
      */
-    private function getEventClass($entity, $type)
+    protected function getEventClass($entity, $type)
     {
         return 'App\Events\\' . ucfirst(class_basename($entity)) . '\\' . ucfirst(class_basename($entity)) . 'Was' . $type;
     }

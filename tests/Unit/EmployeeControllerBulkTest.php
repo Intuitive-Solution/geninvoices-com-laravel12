@@ -50,17 +50,17 @@ class EmployeeControllerBulkTest extends TestCase
         
         $this->assertTrue(
             method_exists($repository, 'archive'),
-            'EmployeeRepository should have archive method from BaseRepository'
+            'EmployeeRepository should have archive method'
         );
         
         $this->assertTrue(
             method_exists($repository, 'restore'),
-            'EmployeeRepository should have restore method from BaseRepository'
+            'EmployeeRepository should have restore method'
         );
         
         $this->assertTrue(
             method_exists($repository, 'delete'),
-            'EmployeeRepository should have delete method from BaseRepository'
+            'EmployeeRepository should have delete method'
         );
     }
 
@@ -98,9 +98,67 @@ class EmployeeControllerBulkTest extends TestCase
         // Test that the method uses repository pattern
         $this->assertStringContainsString('$this->employee_repo->{$action}($employee)', $methodContent);
         
+        // Test that the method uses transformKeys like VendorController
+        $this->assertStringContainsString('$this->transformKeys($ids)', $methodContent);
+        
+        // Test that the method uses find() instead of whereIn()->cursor()
+        $this->assertStringContainsString('find($this->transformKeys($ids))', $methodContent);
+        
         // Test that activate/deactivate cases are not present
         $this->assertStringNotContainsString('activate', $methodContent);
         $this->assertStringNotContainsString('deactivate', $methodContent);
         $this->assertStringNotContainsString('performAction', $methodContent);
+    }
+
+    public function testBulkMethodFollowsVendorPattern()
+    {
+        $repository = new EmployeeRepository();
+        $controller = new EmployeeController($repository);
+        
+        // Get the bulk method and check it follows VendorController pattern
+        $reflection = new \ReflectionMethod($controller, 'bulk');
+        $methodContent = file_get_contents($reflection->getFileName());
+        
+        // Extract the bulk method content
+        $startLine = $reflection->getStartLine();
+        $endLine = $reflection->getEndLine();
+        $lines = file($reflection->getFileName());
+        $methodLines = array_slice($lines, $startLine - 1, $endLine - $startLine + 1);
+        $methodContent = implode('', $methodLines);
+        
+        // Test that it uses each() instead of cursor()->each()
+        $this->assertStringContainsString('->each(function ($employee, $key)', $methodContent);
+        $this->assertStringNotContainsString('cursor()->each', $methodContent);
+        
+        // Test that it checks permissions with can('edit')
+        $this->assertStringContainsString("if (\$user->can('edit', \$employee))", $methodContent);
+        
+        // Test that it returns listResponse with proper query
+        $this->assertStringContainsString('return $this->listResponse(Employee::withTrashed()->whereIn(\'id\', $this->transformKeys($ids)))', $methodContent);
+    }
+
+    public function testBulkMethodPermissionChecks()
+    {
+        $repository = new EmployeeRepository();
+        $controller = new EmployeeController($repository);
+        
+        // Get the bulk method and verify permission checks
+        $reflection = new \ReflectionMethod($controller, 'bulk');
+        $methodContent = file_get_contents($reflection->getFileName());
+        
+        // Extract the bulk method content
+        $startLine = $reflection->getStartLine();
+        $endLine = $reflection->getEndLine();
+        $lines = file($reflection->getFileName());
+        $methodLines = array_slice($lines, $startLine - 1, $endLine - $startLine + 1);
+        $methodContent = implode('', $methodLines);
+        
+        // Test that permission checks are in place
+        $this->assertStringContainsString('auth()->user()', $methodContent);
+        $this->assertStringContainsString("can('edit', \$employee)", $methodContent);
+        
+        // Test that actions are only performed if user has permission
+        $this->assertStringContainsString('if ($user->can(\'edit\', $employee)) {', $methodContent);
+        $this->assertStringContainsString('$this->employee_repo->{$action}($employee);', $methodContent);
     }
 }

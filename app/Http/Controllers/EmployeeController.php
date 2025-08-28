@@ -127,14 +127,14 @@ class EmployeeController extends BaseController
         $action = $request->input('action');
         $ids = $request->input('ids');
 
-        $employees = Employee::withTrashed()->whereIn('id', $ids);
+        $employees = Employee::withTrashed()->find($this->transformKeys($ids));
 
-        $employees->cursor()->each(function ($employee, $key) use ($action, $user) {
+        $employees->each(function ($employee, $key) use ($action, $user) {
             if ($user->can('edit', $employee)) {
                 $this->employee_repo->{$action}($employee);
             }
         });
 
-        return $this->listResponse(Employee::withTrashed()->whereIn('id', $ids));
+        return $this->listResponse(Employee::withTrashed()->whereIn('id', $this->transformKeys($ids)));
     }
 }

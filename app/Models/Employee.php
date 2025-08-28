@@ -43,6 +43,7 @@ class Employee extends BaseModel
         'department',
         'designation',
         'email',
+        'archived_at',
     ];
 
     protected $casts = [
@@ -50,6 +51,7 @@ class Employee extends BaseModel
         'created_at' => 'timestamp',
         'updated_at' => 'timestamp',
         'deleted_at' => 'timestamp',
+        'archived_at' => 'timestamp',
     ];
 
     protected $touches = [];
@@ -74,7 +76,36 @@ class Employee extends BaseModel
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Check if the employee is archived.
+     * An employee is archived when archived_at is set and is_deleted is false.
+     *
+     * @return bool
+     */
+    public function isArchived(): bool
+    {
+        return !is_null($this->archived_at) && !$this->is_deleted;
+    }
 
+    /**
+     * Check if the employee is active.
+     * An employee is active when archived_at is null and is_deleted is false.
+     *
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return is_null($this->archived_at) && !$this->is_deleted;
+    }
 
-
+    /**
+     * Check if the employee is deleted.
+     * An employee is deleted when is_deleted is true.
+     *
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        return $this->is_deleted;
+    }
 }

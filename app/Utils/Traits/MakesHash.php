@@ -79,7 +79,10 @@ trait MakesHash
             }
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid primary key'], 400);
+            if ($return_string_failure) {
+                return "Invalid Primary Key";
+            }
+            throw new \Exception('Invalid primary key: ' . $value);
         }
 
         /*
@@ -102,11 +105,16 @@ trait MakesHash
     public function transformKeys($keys)
     {
         if (is_array($keys)) {
-            foreach ($keys as &$value) {
-                $value = $this->decodePrimaryKey($value);
+            $transformed = [];
+            foreach ($keys as $value) {
+                try {
+                    $transformed[] = $this->decodePrimaryKey($value);
+                } catch (\Exception $e) {
+                    // Skip invalid keys instead of failing the entire operation
+                    continue;
+                }
             }
-
-            return $keys;
+            return $transformed;
         } else {
             return $this->decodePrimaryKey($keys);
         }
