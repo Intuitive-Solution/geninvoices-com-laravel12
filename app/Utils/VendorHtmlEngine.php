@@ -396,7 +396,7 @@ class VendorHtmlEngine
         $data['$font_name'] = ['value' => Helpers::resolveFont($this->settings->primary_font)['name'], 'label' => ''];
         $data['$font_url'] = ['value' => Helpers::resolveFont($this->settings->primary_font)['url'], 'label' => ''];
 
-        $data['$invoiceninja.whitelabel'] = ['value' => 'https://invoicing.co/images/new_logo.png', 'label' => ''];
+        $data['$invoiceninja.whitelabel'] = ['value' => 'data:image/png;base64,'.base64_encode(file_get_contents(public_path('images/new_logo.png'))), 'label' => ''];
 
         $data['$primary_color'] = ['value' => $this->settings->primary_color, 'label' => ''];
         $data['$secondary_color'] = ['value' => $this->settings->secondary_color, 'label' => ''];
