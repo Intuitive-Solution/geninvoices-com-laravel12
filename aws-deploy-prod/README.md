@@ -587,3 +587,25 @@ curl -X POST https://api.geninvoices.com/api/v1/login \
     "one_time_password": "",
     "secret": ""
   }'
+
+## usefull git commands 
+  # Show remote URLs
+git remote -v
+
+# Show all branches
+git branch -a
+
+# Show current status
+git status
+
+# Show recent commits
+git log --oneline -10
+
+# Show detailed info about the remote
+git remote show origin
+
+# Show the current commit hash
+git rev-parse HEAD
+
+# Show the current branch
+git branch --show-current
