@@ -609,3 +609,18 @@ git rev-parse HEAD
 
 # Show the current branch
 git branch --show-current
+
+
+
+# Create deployment script
+sudo -u nginx bash -c "
+cd /var/www/html && \
+git reset --hard HEAD && \
+git clean -fd && \
+git pull origin master && \
+php artisan config:cache && \
+php artisan route:cache && \
+php artisan view:cache
+" && \
+sudo systemctl restart php-fpm && \
+echo "✅ Deployment complete!"

@@ -62,7 +62,6 @@ use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ImportJsonController;
 use App\Http\Controllers\ImportQuickbooksController;
-use App\Http\Controllers\SelfUpdateController;
 use App\Http\Controllers\TaskStatusController;
 use App\Http\Controllers\Bank\YodleeController;
 use App\Http\Controllers\CompanyUserController;
@@ -377,8 +376,6 @@ Route::group(['middleware' => ['throttle:api', 'api_db', 'token_auth', 'locale']
     Route::get('scheduler', [SchedulerController::class, 'index']);
     Route::post('support/messages/send', SendingController::class);
 
-    Route::post('self-update', [SelfUpdateController::class, 'update'])->middleware('password_protected');
-    Route::post('self-update/check_version', [SelfUpdateController::class, 'checkVersion']);
 
     Route::resource('system_logs', SystemLogController::class);
 
