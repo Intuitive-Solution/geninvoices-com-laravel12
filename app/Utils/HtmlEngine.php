@@ -629,6 +629,7 @@ class HtmlEngine
         $data['$task.service'] = ['value' => '', 'label' => ctrans('texts.resource')];
         $data['$task.description'] = ['value' => '', 'label' => ctrans('texts.description')];
         $data['$task.unit'] = ['value' => '', 'label' => ctrans('texts.unit')];
+        $data['$task.rate'] = ['value' => '', 'label' => ctrans('texts.unit')];
         $data['$task.cost'] = ['value' => '', 'label' => ctrans('texts.unit')];
         $data['$task.hours'] = ['value' => '', 'label' => ctrans('texts.quantity')];
         $data['$task.billable_time'] = ['value' => '', 'label' => ctrans('texts.billable_time')];
