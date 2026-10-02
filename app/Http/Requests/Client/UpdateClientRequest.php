@@ -40,7 +40,7 @@ class UpdateClientRequest extends Request
 
     public function rules()
     {
-        /* Ensure we have a client name, and that all emails are unique*/
+        /* Ensure we have a client name. Contact emails may repeat on this client and on other clients. */
         /** @var  \App\Models\User $user */
         $user = auth()->user();
 
@@ -71,7 +71,7 @@ class UpdateClientRequest extends Request
 
         $rules['settings'] = new ValidClientGroupSettingsRule();
         $rules['contacts'] = 'array';
-        $rules['contacts.*.email'] = 'bail|nullable|distinct|sometimes|email';
+        $rules['contacts.*.email'] = 'bail|nullable|sometimes|email';
         $rules['contacts.*.password'] = [
             'nullable',
             'sometimes',

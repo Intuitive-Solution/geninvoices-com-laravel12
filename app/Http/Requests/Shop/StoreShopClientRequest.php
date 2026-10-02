@@ -49,11 +49,11 @@ class StoreShopClientRequest extends Request
             $rules['documents'] = 'file|mimes:png,ai,jpeg,tiff,pdf,gif,psd,txt,doc,xls,ppt,xlsx,docx,pptx|max:20000';
         }
 
-        /* Ensure we have a client name, and that all emails are unique*/
+        /* Contact emails may repeat on this client and on other clients. */
         //$rules['name'] = 'required|min:1';
         $rules['id_number'] = 'unique:clients,id_number,'.$this->id.',id,company_id,'.$this->company_id;
         $rules['settings'] = new ValidClientGroupSettingsRule();
-        $rules['contacts.*.email'] = 'nullable|distinct';
+        $rules['contacts.*.email'] = 'nullable';
         $rules['contacts.*.password'] = [
             'nullable',
             'sometimes',

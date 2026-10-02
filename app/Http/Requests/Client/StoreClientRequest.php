@@ -56,11 +56,11 @@ class StoreClientRequest extends Request
             $rules['file'] = $this->fileValidation();
         }
 
-        /* Ensure we have a client name, and that all emails are unique*/
+        /* Ensure we have a client name. Contact emails may repeat on this client and on other clients. */
         //$rules['name'] = 'required|min:1';
         $rules['settings'] = new ValidClientGroupSettingsRule();
         $rules['contacts'] = 'bail|array';
-        $rules['contacts.*.email'] = 'bail|nullable|distinct|sometimes|email';
+        $rules['contacts.*.email'] = 'bail|nullable|sometimes|email';
         $rules['contacts.*.password'] = [
             'bail',
             'nullable',

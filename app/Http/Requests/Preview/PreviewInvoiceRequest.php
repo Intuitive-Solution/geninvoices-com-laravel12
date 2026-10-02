@@ -13,6 +13,7 @@ namespace App\Http\Requests\Preview;
 
 use App\Http\Requests\Request;
 use App\Models\Client;
+use App\Models\ClientContact;
 use App\Models\Credit;
 use App\Models\CreditInvitation;
 use App\Models\Invoice;
@@ -91,7 +92,7 @@ class PreviewInvoiceRequest extends Request
 
         /** @phpstan-ignore-next-line */
         if (! $this->entity_id ?? false) {
-            return $this->stubInvitation();
+            return $this->withRequestedContact($this->stubInvitation());
         }
 
         match($this->entity) {
@@ -103,10 +104,46 @@ class PreviewInvoiceRequest extends Request
         };
 
         if ($invitation) {
+            return $this->withRequestedContact($invitation);
+        }
+
+        return $this->withRequestedContact($this->stubInvitation());
+    }
+
+    /**
+     * The live preview should follow the contact currently checked on the form,
+     * not the first invitation stored on the invoice.
+     */
+    private function withRequestedContact(mixed $invitation): mixed
+    {
+        $invitations = $this->input('invitations');
+
+        if (! is_array($invitations) || $invitations === []) {
             return $invitation;
         }
 
-        return $this->stubInvitation();
+        $contactId = collect($invitations)->pluck('client_contact_id')->filter()->first();
+
+        if (! $contactId) {
+            return $invitation;
+        }
+
+        $client = $this->getClient();
+
+        if (! $client) {
+            return $invitation;
+        }
+
+        $contact = $client->contacts->firstWhere('id', $contactId);
+
+        if (! $contact instanceof ClientContact) {
+            return $invitation;
+        }
+
+        $invitation->client_contact_id = $contact->id;
+        $invitation->setRelation('contact', $contact);
+
+        return $invitation;
     }
 
     public function getClient(): ?Client
