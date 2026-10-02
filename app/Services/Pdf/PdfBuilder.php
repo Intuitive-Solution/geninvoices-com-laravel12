@@ -1566,8 +1566,39 @@ class PdfBuilder
     public function invoiceDetails(): array
     {
         $variables = $this->service->config->pdf_variables['invoice_details'];
+        $elements = $this->genericDetailsBuilder($variables);
+        $project = $this->firstProductItemName();
 
-        return $this->genericDetailsBuilder($variables);
+        if ($project !== '') {
+            array_unshift($elements, ['element' => 'tr', 'elements' => [
+                ['element' => 'th', 'content' => ctrans('texts.project'), 'properties' => ['data-ref' => 'entity_details-invoice.item_project_label']],
+                ['element' => 'th', 'content' => $project, 'properties' => ['data-ref' => 'entity_details-invoice.item_project']],
+            ]]);
+        }
+
+        return $elements;
+    }
+
+    /**
+     * Item name of the first product line, matching the product table Item column.
+     */
+    private function firstProductItemName(): string
+    {
+        $items = $this->service->config->entity->line_items ?? [];
+
+        foreach ($items as $item) {
+            $typeId = (int) ($item->type_id ?? 0);
+
+            if (! in_array($typeId, [1, 4, 5, 6], true)) {
+                continue;
+            }
+
+            $name = is_null($item->item ?? null) ? ($item->product_key ?? '') : $item->item;
+
+            return trim((string) $name);
+        }
+
+        return '';
     }
 
     /**

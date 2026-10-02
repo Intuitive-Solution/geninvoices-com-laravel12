@@ -205,10 +205,20 @@ class PdfMock
     }
 
     /**
-     * getStubVariables
-     *
-     * @return array
+     * Embed the footer mark so the PDF renderer does not have to fetch a relative URL.
      */
+    private function whitelabelLogo(): string
+    {
+        $relative = ltrim((string) config('ninja.app_logo', '/images/new_logo.png'), '/');
+        $contents = @file_get_contents(public_path($relative));
+
+        if (! is_string($contents) || $contents === '') {
+            return '';
+        }
+
+        return 'data:image/png;base64,'.base64_encode($contents);
+    }
+
     public function getStubVariables(): array
     {
         $entity_pattern = $this->entity_string.'_number_pattern';
@@ -224,6 +234,8 @@ class PdfMock
                 $this->settings->{$entity_pattern},
             );
         }
+
+        $company_logo = $this->company->present()->logo_base64($this->settings);
 
         return ['values' =>
          [
@@ -244,7 +256,7 @@ class PdfMock
     '$client.billing_address2' => '63993 Aiyana View',
     '$client.billing_address1' => '8447',
     '$client.shipping_country' => 'USA',
-    '$invoiceninja.whitelabel' => config('ninja.app_logo'),
+    '$invoiceninja.whitelabel' => $this->whitelabelLogo(),
     '$client.billing_address' => '8447<br/>63993 Aiyana View<br/>Aufderharchester, North Carolina 11243<br/>United States<br/>',
     '$client.billing_country' => 'USA',
     '$task.gross_line_total' => '100',
@@ -418,8 +430,8 @@ class PdfMock
     '$contact.name' => 'Benedict Eichmann',
     '$entity.terms' => 'Default company invoice terms',
     '$client.state' => 'North Carolina',
-    '$company.logo' => $this->settings->company_logo,
-    '$company_logo' => $this->settings->company_logo,
+    '$company.logo' => $company_logo,
+    '$company_logo' => $company_logo,
     '$payment_link' => 'http://ninja.test:8000/client/pay/UAUY8vIPuno72igmXbbpldwo5BDDKIqs',
     '$status_logo' => '',
     '$description' => '',
@@ -891,7 +903,7 @@ class PdfMock
             '$purchase_order.due_date' => '02-12-2021',
             '$vendor.billing_address1' => '589',
           '$vendor.billing_address2' => '761 Odessa Centers Suite 673',
-          '$invoiceninja.whitelabel' => config('ninja.app_logo'),
+          '$invoiceninja.whitelabel' => $this->whitelabelLogo(),
           '$purchase_order.custom1' => 'Custom 1',
           '$purchase_order.custom2' => 'Custom 2',
           '$purchase_order.custom3' => 'Custom 3',

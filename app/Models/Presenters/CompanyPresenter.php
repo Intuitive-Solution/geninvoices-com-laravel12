@@ -75,6 +75,12 @@ class CompanyPresenter extends EntityPresenter
             return $this->logoDocker($settings);
         }
 
+        $embedded = $this->embeddedLogoFromStorage($settings->company_logo ?? '');
+
+        if ($embedded) {
+            return $embedded;
+        }
+
         $context_options = [
             "ssl" => [
                "verify_peer" => false,
@@ -89,6 +95,35 @@ class CompanyPresenter extends EntityPresenter
         } else {
             return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
         }
+    }
+
+    /**
+     * Read a locally stored logo from disk. Preview and PDF rendering
+     * cannot fetch APP_URL when it omits the port the app is served on.
+     */
+    private function embeddedLogoFromStorage(string $logo): ?string
+    {
+        $path = parse_url($logo, PHP_URL_PATH) ?: $logo;
+        $marker = '/storage/';
+        $position = strpos($path, $marker);
+
+        if ($position === false) {
+            return null;
+        }
+
+        $relative = rawurldecode(ltrim(substr($path, $position + strlen($marker)), '/'));
+
+        if ($relative === '' || ! Storage::exists($relative)) {
+            return null;
+        }
+
+        $contents = Storage::get($relative);
+
+        if (! is_string($contents) || $contents === '') {
+            return null;
+        }
+
+        return 'data:image/png;base64,'.base64_encode($contents);
     }
 
     public function email()
